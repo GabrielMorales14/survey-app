@@ -25,6 +25,24 @@ import "pretty-checkbox/dist/pretty-checkbox.css";
 //import "icheck/skins/square/blue.css";
 window["$"] = window["jQuery"] = $;
 //require("icheck");
+export { ResultOne } from './results/result_one'
+export { ResultTwo } from './results/result_two'
+export { ResultThree } from './results/result_three'
+export { ResultFour } from './results/result_four'
+export { ResultFive } from './results/result_five';
+export { ResultSix } from './results/result_six';
+
+var defaultThemeColors = Survey
+  .StylesManager
+  .ThemeColors["default"];
+
+defaultThemeColors["$main-color"] = "#ec3c3c";
+// defaultThemeColors["$main-hover-color"] = "#6fe06f";
+defaultThemeColors["$text-color"] = "#4a4a4a";
+// defaultThemeColors["$header-color"] = "#ec3c3c";
+
+defaultThemeColors["$header-background-color"] = "#4a4a4a";
+defaultThemeColors["$body-container-background-color"] = "#f8f8f8";
 
 Survey.StylesManager.applyTheme("default");
 
@@ -58,103 +76,75 @@ widgets.bootstrapslider(SurveyCore);
 
 class App extends Component {
   json = {
-    title: "Encuesta",
-    description: "Response a las siguientes preguntas.",
+    title: "Evaluación de salud",
+    description: "Response las siguientes preguntas",
     showProgressBar: "top",
+    showQuestionNumbers: "off",
+    locale: 'es',
     pages: [
       {
-        elements: [          
-          {
-            type: "tagbox",
-            name: "position-tags",
-            title: "Choose job positions (Select2 Tagbox)...",
-            choices: [
-              "1|Designer",
-              "2|Front-end Developer",
-              "3|Back-end Developer",
-              "4|Database Administrator",
-              "5|System Engineer"
-            ]
-          },
-          {
-            type: "dropdown",
-            name: "position-s2",
-            title: "Choose job position (Select2)...",
-            renderAs: "select2",
-            choices: [
-              "1|Designer",
-              "2|Front-end Developer",
-              "3|Back-end Developer",
-              "4|Database Administrator",
-              "5|System Engineer"
-            ]
-          },
+        elements: [
           {
             type: "radiogroup",
-            name: "position",
-            title: "Choose job position (iCheck)...",
+            name: "workfrom",
             isRequired: true,
-            colCount: 0,
-            choices: [
-              "1|Designer",
-              "2|Front-end Developer",
-              "3|Back-end Developer",
-              "4|Database Administrator",
-              "5|System Engineer"
-            ]
-          },
-          {
-            type: "radiogroup",
-            name: "position-pc",
-            title: "Choose job position (Pretty checkbox)...",
-            isRequired: true,
+            title: "Elige una de las dos opciones de trabajo",
             renderAs: "prettycheckbox",
-            colCount: 0,
             choices: [
-              "1|Designer",
-              "2|Front-end Developer",
-              "3|Back-end Developer",
-              "4|Database Administrator",
-              "5|System Engineer"
+              "1|Trabajo desde casa",
+              "2|Trabajo en oficina",
             ]
           },
+        ],
+      },
+      {
+        questions: [
           {
-            type: "barrating",
-            name: "barrating1",
-            ratingTheme: "css-stars",
-            title: "Please rate the movie you've just watched",
-            choices: ["1", "2", "3", "4", "5"]
+            type: "boolean",
+            name: "initialquestion",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            title: "¿Tienes algún síntoma como: tos, dolor de garganta, dolor de cabeza y/o fiebre igual o mayor a 38ºC?",
           },
           {
-            type: "imagepicker",
-            name: "choosepicture",
-            title: "What animal would you like to see first ?",
+            type: "boolean",
+            name: "symptomslast7days",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion} == false",
+            title: "¿Llegaste a tener alguno de los síntomas antes mencionados en los últimos 7 días, aunque hayan desaparecido?",
+          },
+          {
+            type: "boolean",
+            name: "traveledlast15days",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{symptomslast7days} == false",
+            title: "¿Ha viajado a algún lugar catalogado como de alto riesgo de contagio por COVID-19 en los últimos 15 días?",
+          },
+          {
+            type: "boolean",
+            name: "coexistlast15days",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{traveledlast15days} == false",
+            title: "¿En los últimos 15 días ha convivido con un amigo o familiar proveniente de un país o ciudad con casos o riesgo alto de contagio de COVID-19; diagnosticado como caso positivo de COVID-19 o que labore en alguna institución de salud?",
+          },
+          {
+            type: "radiogroup",
+            name: "traveldestiny",
+            isRequired: true,
+            title: "Inidicar: ",
+            visibleIf: "{traveledlast15days} == true",
+            renderAs: "prettycheckbox",
             choices: [
-              {
-                value: "lion",
-                imageLink:
-                  "https://surveyjs.io/Content/Images/examples/image-picker/lion.jpg"
-              },
-              {
-                value: "giraffe",
-                imageLink:
-                  "https://surveyjs.io/Content/Images/examples/image-picker/giraffe.jpg"
-              },
-              {
-                value: "panda",
-                imageLink:
-                  "https://surveyjs.io/Content/Images/examples/image-picker/panda.jpg"
-              },
-              {
-                value: "camel",
-                imageLink:
-                  "https://surveyjs.io/Content/Images/examples/image-picker/camel.jpg"
-              }
+              "1|Nacional",
+              "2|Extranjero",
             ]
-          },
-          {
-            type: "bootstrapslider",
-            name: "bootstrapslider"
           },
           {
             type: "dropdown",
@@ -162,158 +152,132 @@ class App extends Component {
             choicesByUrl: {
               url: "https://restcountries.eu/rest/v1/all"
             },
-            name: "countries",
-            title: "Please select the country you have arrived from:"
-          },
-          {
-            type: "signaturepad",
-            name: "sign",
-            title: "Please enter your signature"
-          },
-          {
-            type: "sortablelist",
-            name: "lifepriopity",
-            title: "Life Priorities ",
             isRequired: true,
-            colCount: 0,
-            choices: ["family", "work", "pets", "travels", "games"]
+            visibleIf: "{traveledlast15days}",
+            name: "countries",
+            title: "Indicar ciudad:"
           },
           {
-            name: "date",
+            name: "dateout",
             type: "datepicker",
             inputType: "date",
-            title: "Your favorite date:",
+            visibleIf: "{traveledlast15days}",
+            title: "Indicar fecha de salida:",
             dateFormat: "mm/dd/yy",
             isRequired: true
-          }
-        ]
-      },
-      {
-        questions: [
-          {
-            type: "signaturepad",
-            width: "500px",
-            name: "Signature Pad - you can enter your signature here:"
           },
           {
-            type: "matrix",
-            name: "Quality",
-            title:
-              "Please indicate if you agree or disagree with the following statements",
-            columns: [
-              {
-                value: 1,
-                text: "Strongly Disagree"
-              },
-              {
-                value: 2,
-                text: "Disagree"
-              },
-              {
-                value: 3,
-                text: "Neutral"
-              },
-              {
-                value: 4,
-                text: "Agree"
-              },
-              {
-                value: 5,
-                text: "Strongly Agree"
-              }
-            ],
-            rows: [
-              {
-                value: "affordable",
-                text: "Product is affordable"
-              },
-              {
-                value: "does what it claims",
-                text: "Product does what it claims"
-              },
-              {
-                value: "better then others",
-                text: "Product is better than other products on the market"
-              },
-              {
-                value: "easy to use",
-                text: "Product is easy to use"
-              }
-            ]
-          },
-          {
-            type: "rating",
-            name: "satisfaction",
-            title: "How satisfied are you with the Product?",
-            mininumRateDescription: "Not Satisfied",
-            maximumRateDescription: "Completely satisfied"
-          },
-          {
-            type: "rating",
-            name: "recommend friends",
-            visibleIf: "{satisfaction} > 3",
-            title:
-              "How likely are you to recommend the Product to a friend or co-worker?",
-            mininumRateDescription: "Will not recommend",
-            maximumRateDescription: "I will recommend"
+            name: "datein",
+            type: "datepicker",
+            inputType: "date",
+            visibleIf: "{traveledlast15days}",
+            title: "Indicar fecha de llegada:",
+            dateFormat: "mm/dd/yy",
+            isRequired: true
           },
           {
             type: "comment",
-            name: "suggestions",
-            title: "What would make you more satisfied with the Product?"
-          }
-        ]
-      },
-      {
-        questions: [
-          {
-            type: "radiogroup",
-            name: "price to competitors",
-            title: "Compared to our competitors, do you feel the Product is",
-            choices: [
-              "Less expensive",
-              "Priced about the same",
-              "More expensive",
-              "Not sure"
-            ]
+            name: "scales",
+            visibleIf: "{traveledlast15days}",
+            isRequired: true,
+            title: "Indicar escalas:"
           },
           {
-            type: "radiogroup",
-            name: "price",
-            title: "Do you feel our current price is merited by our product?",
-            choices: [
-              "correct|Yes, the price is about right",
-              "low|No, the price is too low for your product",
-              "high|No, the price is too high for your product"
-            ]
+            type: "boolean",
+            name: "diabetes",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion}",
+            title: "¿Tienes diabetes?",
           },
           {
-            type: "multipletext",
-            name: "pricelimit",
-            title: "What is the... ",
-            items: [
-              {
-                name: "mostamount",
-                title: "Most amount you would every pay for a product like ours"
-              },
-              {
-                name: "leastamount",
-                title: "The least amount you would feel comfortable paying"
-              }
-            ]
-          }
-        ]
+            type: "boolean",
+            name: "hypertension",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion}",
+            title: "¿Tienes hipertensión?",
+          },
+          {
+            type: "boolean",
+            name: "obesity",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion}",
+            title: "¿Tienes obesidad?",
+          },
+          {
+            type: "boolean",
+            name: "disease",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion}",
+            title: "¿Padeces una enfermedad o tomas un medicamento que baje tus defensas?",
+          },
+          {
+            type: "boolean",
+            name: "pregnant",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion}",
+            title: "¿Estás embarazada?",
+          },
+          {
+            type: "boolean",
+            name: "symptoms",
+            labelFalse: "No",
+            labelTrue: "Sí",
+            isRequired: true,
+            visibleIf: "{initialquestion} == true",
+            title: "¿Presentas alguno de los siguientes síntomas: ¿falta de aire, respiración rápida, dificultad para respirar o desorientación?",
+          },
+        ],
       },
       {
-        questions: [
+        elements: [
           {
-            type: "text",
-            name: "email",
-            title:
-              'Thank you for taking our survey. Please enter your email address, then press the "Submit" button.'
-          }
+            type: "resultone",            
+            title: "Resultado: ",
+            name: "resultone",
+            visibleIf: "{symptoms}",            
+          },
+          {
+            type: "resulttwo",            
+            title: "Resultado: ",
+            name: "resulttwo",       
+            visibleIf: "{symptoms} == false",
+          },
+          {
+            type: "resultthree",            
+            title: "Resultado: ",
+            name: "resultthree",       
+            visibleIf: "{symptomslast7days}",
+          },
+          {
+            type: "resultfour",            
+            title: "Resultado: ",
+            name: "resultfour",       
+            visibleIf: "{traveledlast15days}",
+          },
+          {
+            type: "resultfive",            
+            title: "Resultado: ",
+            name: "resultfive",       
+            visibleIf: "{coexistlast15days}",
+          },
+          {
+            type: "resultsix",            
+            title: "Resultado: ",
+            name: "resultsix",       
+            visibleIf: "{coexistlast15days} == false",
+          },
         ]
-      }
+      },      
     ]
   };
 
@@ -333,6 +297,8 @@ class App extends Component {
 
   render() {
     var model = new Survey.Model(this.json);
+    var myloc = Survey.surveyLocalization.locales["es"];
+    myloc.completingSurvey = "¡Gracias por contestar ésta evaluación de salud!"
     return (
       <div className="App">
         <div className="App-header">
